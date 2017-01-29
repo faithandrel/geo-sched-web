@@ -14,8 +14,8 @@ class CreateItemsTable extends Migration
     {
         Schema::create('items', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('title');
-            $table->text('content');
+            $table->string('title')->collation('utf8mb4_general_ci');;
+            $table->text('content')->collation('utf8mb4_general_ci');;
             
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')
@@ -25,8 +25,8 @@ class CreateItemsTable extends Migration
             $table->foreign('item_id')
                     ->references('id')->on('items');
             
-            $table->double('lat');
-            $table->double('long');
+            $table->double('latitude');
+            $table->double('longitude');
             
             $table->softDeletes();
             $table->timestamps();

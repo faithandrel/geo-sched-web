@@ -16,5 +16,6 @@ class VerifyCsrfToken extends BaseVerifier
        'fb-sign-up-from-app',
        'fb-sign-up-from-app',
        'test-auth',
+       'save-item'
     ];
 }

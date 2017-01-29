@@ -107,3 +107,27 @@ Route::post('test-auth', ['middleware' => ['cors'], function(Request $request) {
 Route::get('test-angular2-jwt', ['middleware' => ['cors', 'jwt.auth'], function(Request $request) {
     return Response::json($request->input());
 }]);
+
+Route::post('save-item', ['middleware' => ['jwt.auth'], function(Request $request) {
+   $token = JWTAuth::getToken();
+   $user = JWTAuth::toUser($token);
+       
+   $data = $request->input();
+   
+   $new_item = new Item;
+   $new_item->user_id = $user->id;
+   $new_item->content = utf8_encode($request->content);
+   $new_item->fill($data);
+   $new_item->save();
+   
+   return response()->json($new_item);
+   
+}]);
+
+Route::get('get-items', ['middleware' => ['jwt.auth'], function(Request $request) {
+   $token = JWTAuth::getToken();
+   $user = JWTAuth::toUser($token);
+   $items = $user->items;
+   return response()->json($items);
+  
+}]);
