@@ -108,7 +108,7 @@ return [
     |
     */
 
-    'log' => env('APP_LOG', 'single'),
+    'log' => env('APP_LOG', 'daily'),
 
     /*
     |--------------------------------------------------------------------------
@@ -159,6 +159,7 @@ return [
         GoogleMaps\ServiceProvider\GoogleMapsServiceProvider::class,
         Laravel\Socialite\SocialiteServiceProvider::class,
         Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class,
+        ChristofferOK\LaravelEmojiOne\LaravelEmojiOneServiceProvider::class,
     ],
 
     /*
@@ -208,6 +209,7 @@ return [
         'GoogleMaps' => GoogleMaps\Facade\GoogleMapsFacade::class,
         'Socialite' => Laravel\Socialite\Facades\Socialite::class,
         'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
+        'LaravelEmojiOne' => ChristofferOK\LaravelEmojiOne\LaravelEmojiOneFacade::class,
     ],
     
     'mobile_app_token' => 'faithhellworld'

@@ -9,14 +9,18 @@
         "laravel/framework": "5.2.*",
         "alexpechkarev/google-maps":"1.0.4",
         "laravel/socialite": "^2.0",
-        "tymon/jwt-auth": "0.5.*"
+        "tymon/jwt-auth": "0.5.*",
+        "emojione/emojione": "^2.2",
+        "christofferok/laravel-emojione": "^1.0",
+        "bosnadev/repositories": "0.*"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
         "mockery/mockery": "0.9.*",
         "phpunit/phpunit": "~4.0",
         "symfony/css-selector": "2.8.*|3.0.*",
-        "symfony/dom-crawler": "2.8.*|3.0.*"
+        "symfony/dom-crawler": "2.8.*|3.0.*",
+        "laravel/homestead": "^4.0"
     },
     "autoload": {
         "classmap": [

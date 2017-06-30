@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateItemsTable extends Migration
+class CreateViewsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,11 +12,9 @@ class CreateItemsTable extends Migration
      */
     public function up()
     {
-        Schema::create('items', function (Blueprint $table) {
+         Schema::create('views', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('title')->collation('utf8mb4_general_ci');
-            $table->text('content')->collation('utf8mb4_general_ci');
-            
+
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')
                     ->references('id')->on('users');
@@ -24,7 +22,7 @@ class CreateItemsTable extends Migration
             $table->integer('item_id')->unsigned()->nullable();
             $table->foreign('item_id')
                     ->references('id')->on('items');
-            
+
             $table->timestamps();
         });
     }
@@ -36,6 +34,6 @@ class CreateItemsTable extends Migration
      */
     public function down()
     {
-        Schema::drop('items');
+        Schema::drop('views');
     }
 }

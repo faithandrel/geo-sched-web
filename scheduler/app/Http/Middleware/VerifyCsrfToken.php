@@ -14,8 +14,9 @@ class VerifyCsrfToken extends BaseVerifier
     protected $except = [
        'test-save-from-app',
        'fb-sign-up-from-app',
-       'fb-sign-up-from-app',
-       'test-auth',
+       'fb-sign-up',
+       'password-log-in',
+       'facebook-log-in',
        'save-item'
     ];
 }

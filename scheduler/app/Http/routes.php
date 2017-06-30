@@ -12,24 +12,37 @@
 */
 use Illuminate\Http\Request;
 use Illuminate\Http\Response as HttpResponse;
-use App\User;
-use App\Item;
-use App\Signup;
+use App\Models\User;
+use App\Models\Item;
+use App\Models\Signup;
 use App\Geolocation;
 
 Route::get('/', function () {
-   $response = \GoogleMaps::load('geocoding')
+   /*$response = \GoogleMaps::load('geocoding')
         ->setParam (['address' =>'santa cruz'])
         ->get();
-    return response()->json($response);
+    return response()->json($response);*/
+    
+    /*$matches = [];
+    $items = Item::all();
+    echo var_dump(preg_match_all('/\:(.*?)\:/', LaravelEmojiOne::toShort($items[0]->content), $matches));
+    $emoji_array = $matches[1];
+
+    foreach ($emoji_array as $emoji) {
+      echo $emoji." - ".LaravelEmojiOne::shortnameToUnicode(":".$emoji.":")."<br/>";
+    }*/
+
+    return view('welcome');
 });
 
+//deprecated
 Route::get('sign-up-facebook', function (Request $request) {
     $signup_session = $request->signup;
     $request->session()->flash('signup', $signup_session);
     return Socialite::driver('facebook')->redirect();
 });
 
+//deprecated
 Route::get('facebook-callback', function (Request $request) {
     
     $save_signup = Signup::where('session', $request->session()->get('signup'))
@@ -45,6 +58,39 @@ Route::get('facebook-callback', function (Request $request) {
     
     return view('welcome');
 });
+
+//deprecated
+Route::post('fb-sign-up-from-app', ['middleware' => 'cors', function (Request $request) {
+    $signup = new Signup;
+    
+    $signup->session = $request->session()->token();
+    $signup->username = $request->username;
+    $signup->password = Hash::make($request->password);
+    
+    $signup->save();
+    
+    return response()->json($request->session()->token());
+}]);
+
+Route::post('fb-sign-up', ['middleware' => 'cors', function (Request $request) {
+    $data = $request->all();
+
+    if(!empty($data['facebook'])) {
+      $facebook_user = Socialite::driver('facebook')->userFromToken($data['access']);
+
+      if(!empty($facebook_user)) {
+          $user = new User;
+          $user->name = $data['username'];
+          $user->password = bcrypt(str_random(12));
+          $user->facebook = $data['facebook'];
+          $user->email = $facebook_user->getEmail();
+          $user->save();
+
+          return response()->json($user);
+      }
+    }
+   // return response()->json($data);
+}]);
 
 Route::get('test-save', function (Request $request) {
    
@@ -69,18 +115,6 @@ Route::post('test-save-from-app', ['middleware' => 'cors', function (Request $re
     return response()->json($request);
 }]);
 
-Route::post('fb-sign-up-from-app', ['middleware' => 'cors', function (Request $request) {
-    $signup = new Signup;
-    
-    $signup->session = $request->session()->token();
-    $signup->username = $request->username;
-    $signup->password = Hash::make($request->password);
-    
-    $signup->save();
-    
-    return response()->json($request->session()->token());
-}]);
-
 Route::get('test-token', ['middleware' => 'cors', function() {
     return response()->json(Hash::make(Config::get('app.mobile_app_token')));
 }]);
@@ -93,7 +127,7 @@ Route::get('test-user-auth', function () {
     else echo 'not valid';
 });
 
-Route::post('test-auth', ['middleware' => ['cors'], function(Request $request) {
+Route::post('password-log-in', ['middleware' => ['cors'], function(Request $request) {
 
     if ( ! $token = JWTAuth::attempt(['name' => $request->username,
                                       'password' => $request->password])) {
@@ -104,26 +138,28 @@ Route::post('test-auth', ['middleware' => ['cors'], function(Request $request) {
     //return Response::json($request->input());
 }]);
 
+Route::post('facebook-log-in', ['middleware' => ['cors'], function(Request $request) {
+    $user = User::where('facebook', '=', $request->facebook)->first();
+
+    if ( ! $token = JWTAuth::fromUser($user)) {
+        return Response::json(false, HttpResponse::HTTP_UNAUTHORIZED);
+    }
+    
+    return Response::json(compact('token'));
+}]);
+
 Route::get('test-angular2-jwt', ['middleware' => ['cors', 'jwt.auth'], function(Request $request) {
     return Response::json($request->input());
 }]);
 
-Route::post('save-item', ['middleware' => ['jwt.auth'], function(Request $request) {
-   $token = JWTAuth::getToken();
-   $user = JWTAuth::toUser($token);
-       
-   $data = $request->input();
-   
-   $new_item = new Item;
-   $new_item->user_id = $user->id;
-   $new_item->content = utf8_encode($request->content);
-   $new_item->fill($data);
-   $new_item->save();
-   
-   return response()->json($new_item);
-   
-}]);
+Route::group(['middleware' => 'jwt.auth'], function () {
+  Route::post('save-item', [
+        'as'   => 'saveItem',
+        'uses' => 'ItemController@store',
+      ]);
+});
 
+//TODO: move to controller
 Route::get('get-items', ['middleware' => ['jwt.auth'], function(Request $request) {
    $token = JWTAuth::getToken();
    $user = JWTAuth::toUser($token);

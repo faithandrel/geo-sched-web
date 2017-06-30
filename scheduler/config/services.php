@@ -36,9 +36,9 @@ return [
     ],
     
     'facebook' => [
-        'client_id' => '1609058426083574',
-        'client_secret' => '91e0c99ffdbbd0f411ed1b3d8131eefd',
-        'redirect' => 'http://8b901d1e.ngrok.io/standbyme/public/facebook-callback',
+        'client_id' => '1894274194178418',//'1609058426083574',
+        'client_secret' => '450dc5cc896556300575d0d3dcc3eec7',//'91e0c99ffdbbd0f411ed1b3d8131eefd',
+        'redirect' => 'http://e8abb9e4.ngrok.io/facebook-callback',
     ],
 
 ];

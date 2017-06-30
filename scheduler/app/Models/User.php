@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -26,6 +26,6 @@ class User extends Authenticatable
     
     public function items()
     {
-        return $this->hasMany('App\Models\Item');
+        return $this->hasMany('App\Item');
     }
 }
