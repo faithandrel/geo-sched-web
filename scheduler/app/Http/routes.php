@@ -139,6 +139,7 @@ Route::post('password-log-in', ['middleware' => ['cors'], function(Request $requ
 }]);
 
 Route::post('facebook-log-in', ['middleware' => ['cors'], function(Request $request) {
+    //TODO: check access token for better security
     $user = User::where('facebook', '=', $request->facebook)->first();
 
     if ( ! $token = JWTAuth::fromUser($user)) {

@@ -1,11 +1,11 @@
 <?php namespace App\Repositories;
 
 use Bosnadev\Repositories\Eloquent\Repository;
-use App\Models\Item;
+use App\Models\Location;
 
-class ItemRepository extends Repository {
+class LocationRepository extends Repository {
 	
 	public function model() {
-        return Item::class;
+        return Location::class;
     }
 }

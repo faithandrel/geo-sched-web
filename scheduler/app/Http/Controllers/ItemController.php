@@ -5,11 +5,20 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
-use App\Models\Item;
+use App\Repositories\ItemRepository;
+use App\Repositories\LocationRepository;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ItemController extends Controller
 {
+    private $itemRepository, $locationRepository;
+
+    public function __construct(ItemRepository $itemRepo,
+                                LocationRepository $locationRepo) {
+        $this->itemRepository       = $itemRepo;
+        $this->locationRepository   = $locationRepo;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -38,16 +47,16 @@ class ItemController extends Controller
      */
     public function store(Request $request)
     {
-       $token = JWTAuth::getToken();
-       $user = JWTAuth::toUser($token);
+       //$token = ;
+       $user = JWTAuth::toUser(JWTAuth::getToken());
            
        $data = $request->input();
+       $data['content'] = utf8_encode($data['content']);
+       $data['user_id'] = $user->id;
        
-       $new_item = new Item;
-       $new_item->user_id = $user->id;
-       $new_item->content = utf8_encode($request->content);
-       $new_item->fill($data);
-       $new_item->save();
+       $new_item = $this->itemRepository->create($data);
+       $location  = $this->locationRepository->create($data);
+       $new_item->locations()->save($location);
        
        return response()->json($new_item);
     }
