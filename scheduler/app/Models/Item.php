@@ -16,7 +16,15 @@ class Item extends Model
         return utf8_decode($content);
     }
 
+    public function getTitleAttribute($title) {
+        return utf8_decode($title);
+    }
+
     public function locations() {
         return $this->morphMany(Location::class, 'locationable');
+    }
+
+    public function tags() {
+        return $this->belongsToMany(Tag::class);
     }
 }

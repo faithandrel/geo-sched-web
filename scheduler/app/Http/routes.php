@@ -16,8 +16,10 @@ use App\Models\User;
 use App\Models\Item;
 use App\Models\Signup;
 use App\Geolocation;
+use App\Services\EmojiParser;
+use App\Repositories\TagRepository;
 
-Route::get('/', function () {
+Route::get('/', function (Request $request, TagRepository $tagRepo) {
    /*$response = \GoogleMaps::load('geocoding')
         ->setParam (['address' =>'santa cruz'])
         ->get();
@@ -25,8 +27,13 @@ Route::get('/', function () {
     
     /*$matches = [];
     $items = Item::all();
-    echo var_dump(preg_match_all('/\:(.*?)\:/', LaravelEmojiOne::toShort($items[0]->content), $matches));
-    $emoji_array = $matches[1];
+    $stringToParse = $items[2]->content;
+    $tagRepo->createFromArray($items[2], [$items[2]->content, $items[3]->content]);
+
+    echo var_dump(preg_match_all('/\:(.*?)\:/', LaravelEmojiOne::toShort($stringToParse), $matches));
+    
+    $emoji_array = EmojiParser::parse($stringToParse); //array_unique($matches[1]);
+    echo var_dump($emoji_array);
 
     foreach ($emoji_array as $emoji) {
       echo $emoji." - ".LaravelEmojiOne::shortnameToUnicode(":".$emoji.":")."<br/>";
