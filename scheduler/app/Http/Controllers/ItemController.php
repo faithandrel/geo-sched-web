@@ -77,7 +77,7 @@ class ItemController extends Controller
      */
     public function show($id)
     {
-        //
+        return response()->json($this->itemRepository->find($id));
     }
 
     /**

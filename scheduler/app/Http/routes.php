@@ -38,8 +38,9 @@ Route::get('/', function (Request $request, TagRepository $tagRepo) {
     foreach ($emoji_array as $emoji) {
       echo $emoji." - ".LaravelEmojiOne::shortnameToUnicode(":".$emoji.":")."<br/>";
     }*/
-
-    return view('welcome');
+    $items = Item::all();
+    return response()->json($items);
+    //return view('welcome');
 });
 
 //deprecated
@@ -123,7 +124,7 @@ Route::post('test-save-from-app', ['middleware' => 'cors', function (Request $re
 }]);
 
 Route::get('test-token', ['middleware' => 'cors', function() {
-    return response()->json(Hash::make(Config::get('app.mobile_app_token')));
+    return response()->json(['token' => Hash::make(Config::get('app.mobile_app_token'))]);
 }]);
 
 Route::get('test-user-auth', function () {
@@ -156,18 +157,18 @@ Route::post('facebook-log-in', ['middleware' => ['cors'], function(Request $requ
     return Response::json(compact('token'));
 }]);
 
-Route::get('test-angular2-jwt', ['middleware' => ['cors', 'jwt.auth'], function(Request $request) {
-    return Response::json($request->input());
-}]);
-
 Route::group(['middleware' => 'jwt.auth'], function () {
   Route::post('save-item', [
         'as'   => 'saveItem',
         'uses' => 'ItemController@store',
       ]);
+  Route::get('item/{id}', [
+        'as'   => 'showItem',
+        'uses' => 'ItemController@show',
+      ]);
 });
 
-//TODO: move to controller
+//TODO: move to controller index
 Route::get('get-items', ['middleware' => ['jwt.auth'], function(Request $request) {
    $token = JWTAuth::getToken();
    $user = JWTAuth::toUser($token);
