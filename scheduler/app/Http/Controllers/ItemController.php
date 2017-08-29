@@ -27,9 +27,17 @@ class ItemController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $token     = JWTAuth::getToken();
+        $user      = JWTAuth::toUser($token);
+        //$itemQuery = $user->items();
+
+        if(!is_null($itemId = $request->get('item'))) {
+            return response()->json($this->itemRepository->findAllBy('item_id', $itemId));
+        }
+
+        return response()->json($this->itemRepository->findAllBy('item_id', NULL));
     }
 
     /**
@@ -63,6 +71,7 @@ class ItemController extends Controller
        
        $new_item = $this->itemRepository->create($data);
        $location  = $this->locationRepository->create($data);
+       //No tags on comments
        $this->tagRepository->createFromArray($new_item, [$title, $content]);
        $new_item->locations()->save($location);
        
@@ -77,7 +86,9 @@ class ItemController extends Controller
      */
     public function show($id)
     {
-        return response()->json($this->itemRepository->find($id));
+        $item = $this->itemRepository->find($id);
+        $item->comments = $item->comments;
+        return response()->json($item);
     }
 
     /**

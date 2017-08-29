@@ -25,10 +25,10 @@ Route::get('/', function (Request $request, TagRepository $tagRepo) {
         ->get();
     return response()->json($response);*/
     
-    /*$matches = [];
+    $matches = [];
     $items = Item::all();
-    $stringToParse = $items[2]->content;
-    $tagRepo->createFromArray($items[2], [$items[2]->content, $items[3]->content]);
+    $stringToParse = $items[9]->title;
+    //$tagRepo->createFromArray($items[2], [$items[2]->content, $items[3]->content]);
 
     echo var_dump(preg_match_all('/\:(.*?)\:/', LaravelEmojiOne::toShort($stringToParse), $matches));
     
@@ -37,9 +37,9 @@ Route::get('/', function (Request $request, TagRepository $tagRepo) {
 
     foreach ($emoji_array as $emoji) {
       echo $emoji." - ".LaravelEmojiOne::shortnameToUnicode(":".$emoji.":")."<br/>";
-    }*/
-    $items = Item::all();
-    return response()->json($items);
+    }
+    /*$items = Item::all();
+    return response()->json($items);*/
     //return view('welcome');
 });
 
@@ -158,6 +158,10 @@ Route::post('facebook-log-in', ['middleware' => ['cors'], function(Request $requ
 }]);
 
 Route::group(['middleware' => 'jwt.auth'], function () {
+  Route::get('get-items', [
+        'as'   => 'getItems',
+        'uses' => 'ItemController@index',
+      ]);
   Route::post('save-item', [
         'as'   => 'saveItem',
         'uses' => 'ItemController@store',
@@ -167,12 +171,3 @@ Route::group(['middleware' => 'jwt.auth'], function () {
         'uses' => 'ItemController@show',
       ]);
 });
-
-//TODO: move to controller index
-Route::get('get-items', ['middleware' => ['jwt.auth'], function(Request $request) {
-   $token = JWTAuth::getToken();
-   $user = JWTAuth::toUser($token);
-   $items = $user->items()->whereNull('item_id')->get();
-   return response()->json($items);
-  
-}]);
