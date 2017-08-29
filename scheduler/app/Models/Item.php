@@ -10,6 +10,7 @@ class Item extends Model
         'title', 
         'content',
         'user_id',
+        'item_id',
     ];
     
     public function getContentAttribute($content) {

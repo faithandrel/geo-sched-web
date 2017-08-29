@@ -172,7 +172,7 @@ Route::group(['middleware' => 'jwt.auth'], function () {
 Route::get('get-items', ['middleware' => ['jwt.auth'], function(Request $request) {
    $token = JWTAuth::getToken();
    $user = JWTAuth::toUser($token);
-   $items = $user->items;
+   $items = $user->items()->whereNull('item_id')->get();
    return response()->json($items);
   
 }]);
