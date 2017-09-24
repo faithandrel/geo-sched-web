@@ -12,6 +12,12 @@ class TagRepository extends Repository {
         return Tag::class;
     }
 
+    /**
+     * Stores emoji tags for item from given strings
+     * @param Item $item 
+     * @param Array $strings 
+     * @return type
+     */
     public function createFromArray(Item $item, Array $strings) {
     	$tags = [];
 

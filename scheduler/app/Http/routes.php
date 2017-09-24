@@ -171,3 +171,8 @@ Route::group(['middleware' => 'jwt.auth'], function () {
         'uses' => 'ItemController@show',
       ]);
 });
+
+Route::get('explore-feed', [
+        'as'   => 'exploreFeed',
+        'uses' => 'ExploreController@index',
+      ]);
