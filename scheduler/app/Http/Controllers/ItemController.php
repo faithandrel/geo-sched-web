@@ -29,14 +29,16 @@ class ItemController extends Controller
      */
     public function index(Request $request)
     {
-        $token     = JWTAuth::getToken();
-        $user      = JWTAuth::toUser($token);
+        /*$token     = JWTAuth::getToken();
+        $user      = JWTAuth::toUser($token);*/
         //$itemQuery = $user->items();
 
         if(!is_null($itemId = $request->get('item'))) {
+            //returns items that are comments
             return response()->json($this->itemRepository->findAllBy('item_id', $itemId));
         }
 
+        //returns plain items
         return response()->json($this->itemRepository->findAllBy('item_id', NULL));
     }
 

@@ -170,9 +170,14 @@ Route::group(['middleware' => 'jwt.auth'], function () {
         'as'   => 'showItem',
         'uses' => 'ItemController@show',
       ]);
-});
-
-Route::get('explore-feed', [
+  Route::get('explore-feed', [
         'as'   => 'exploreFeed',
         'uses' => 'ExploreController@index',
       ]);
+  Route::post('emoji', [
+        'as'   => 'emojiFeed',
+        'uses' => 'ExploreController@getItemsForEmoji',
+      ]);
+});
+
+

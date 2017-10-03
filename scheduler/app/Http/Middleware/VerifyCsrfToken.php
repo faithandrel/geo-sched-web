@@ -17,6 +17,7 @@ class VerifyCsrfToken extends BaseVerifier
        'fb-sign-up',
        'password-log-in',
        'facebook-log-in',
-       'save-item'
+       'save-item',
+       'emoji',
     ];
 }

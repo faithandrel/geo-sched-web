@@ -12,6 +12,10 @@ class Item extends Model
         'user_id',
         'item_id',
     ];
+
+    protected $hidden = [
+        'pivot', 
+    ];
     
     public function getContentAttribute($content) {
         return utf8_decode($content);
