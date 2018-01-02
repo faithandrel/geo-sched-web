@@ -8,6 +8,7 @@
         "php": ">=7.0.0",
         "alexpechkarev/google-maps": "^1.0",
         "bosnadev/repositories": "^0.13.0",
+        "brozot/laravel-fcm": "^1.2",
         "christofferok/laravel-emojione": "^1.0",
         "fideloper/proxy": "~3.3",
         "laravel/framework": "5.5.*",

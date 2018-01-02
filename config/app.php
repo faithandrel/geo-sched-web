@@ -181,6 +181,7 @@ return [
         Laravel\Socialite\SocialiteServiceProvider::class,
         Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class,
         ChristofferOK\LaravelEmojiOne\LaravelEmojiOneServiceProvider::class,
+        LaravelFCM\FCMServiceProvider::class, 
     ],
 
     /*
@@ -234,6 +235,8 @@ return [
         'Socialite' => Laravel\Socialite\Facades\Socialite::class,
         'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
         'LaravelEmojiOne' => ChristofferOK\LaravelEmojiOne\LaravelEmojiOneFacade::class,
+        'FCM'      => LaravelFCM\Facades\FCM::class,
+        'FCMGroup' => LaravelFCM\Facades\FCMGroup::class,
     ],
     
     'mobile_app_token' => 'faithhellworld'

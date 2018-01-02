@@ -73,7 +73,7 @@ class ItemController extends Controller
        
        $new_item = $this->itemRepository->create($data);
        $location  = $this->locationRepository->create($data);
-       //No tags on comments
+       //TODO: No tags on comments
        $this->tagRepository->createFromArray($new_item, [$title, $content]);
        $new_item->locations()->save($location);
        

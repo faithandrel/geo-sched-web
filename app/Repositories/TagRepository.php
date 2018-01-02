@@ -1,7 +1,7 @@
 <?php namespace App\Repositories;
 
 use Bosnadev\Repositories\Eloquent\Repository;
-use App\Services\EmojiParser;
+use App\Services\Emoji\EmojiParser;
 use App\Models\Tag;
 use App\Models\Item;
 use Carbon\Carbon;
@@ -15,7 +15,7 @@ class TagRepository extends Repository {
     /**
      * Stores emoji tags for item from given strings
      * @param Item $item 
-     * @param Array $strings 
+     * @param Array $string 
      * @return type
      */
     public function createFromArray(Item $item, Array $strings) {
