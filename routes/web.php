@@ -17,8 +17,10 @@ use App\Models\User;
 use App\Models\Item;
 use App\Models\Signup;
 use App\Geolocation;
-use App\Services\EmojiParser;
+use App\Services\Emoji\EmojiParser;
 use App\Repositories\TagRepository;
+use LaravelFCM\Message\PayloadNotificationBuilder;
+use App\Notifications\NewComment;
 
 Route::get('/', function (Request $request, TagRepository $tagRepo) {
    /*$response = \GoogleMaps::load('geocoding')
@@ -149,12 +151,27 @@ Route::post('password-log-in', ['middleware' => ['cors'], function(Request $requ
 
 Route::post('facebook-log-in', ['middleware' => ['cors'], function(Request $request) {
     //TODO: check access token for better security
+
+    if (empty($request->facebook)) {
+        return Response::json(false, HttpResponse::HTTP_UNAUTHORIZED);
+    }
+
     $user = User::where('facebook', '=', $request->facebook)->first();
 
+    if (is_null($user)) {
+        return Response::json(false, HttpResponse::HTTP_UNAUTHORIZED);
+    }
+   
     if ( ! $token = JWTAuth::fromUser($user)) {
         return Response::json(false, HttpResponse::HTTP_UNAUTHORIZED);
     }
     
+    if(!empty($deviceToken = $request->deviceToken)) {
+      //TODO: more logic for device token here
+      $user->device_token = $deviceToken;
+      $user->save();
+    }
+
     return Response::json(compact('token'));
 }]);
 
@@ -181,3 +198,35 @@ Route::group(['middleware' => 'jwt.auth'], function () {
       ]);
 });
 
+Route::get('test', function (Request $request) {
+  /*$deviceToken = User::first()->device_token;
+  
+  $notificationBuilder = new PayloadNotificationBuilder();
+  $notificationBuilder->setTitle('title')
+                  ->setBody('it\'s still me!')
+                  ->setSound('default')
+                  ->setTag('test');
+
+  $notification = $notificationBuilder->build();
+
+  $result = FCM::sendTo($deviceToken, null, $notification);
+
+  echo var_dump($result);*/
+
+  $user  = User::find(2);
+  $item  = Item::find(1);
+  $actor = User::find(4);
+
+  $user->notifyClient(new NewComment($item, $actor));
+  $notifications = $user->unreadNotifications;
+
+  /*$notification = $notifications[0];
+
+  $notification->data = ['test' => 'This is a test'];
+
+  $notification->save();*/
+
+  echo var_dump($notifications->sortByDesc('updated_at')->all());
+
+  //echo var_dump($notifications[0]->updated_)
+});

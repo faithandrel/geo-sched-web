@@ -8,18 +8,23 @@ use App\Http\Requests;
 use App\Repositories\ItemRepository;
 use App\Repositories\LocationRepository;
 use App\Repositories\TagRepository;
+use App\Repositories\UserRepository;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Notifications\NewComment;
+
 
 class ItemController extends Controller
 {
-    private $itemRepository, $locationRepository, $tagRepository;
+    private $itemRepository, $locationRepository, $tagRepository, $userRepository;
 
     public function __construct(ItemRepository $itemRepo,
                                 LocationRepository $locationRepo,
-                                TagRepository $tagRepo) {
+                                TagRepository $tagRepo,
+                                UserRepository $userRepo) {
         $this->itemRepository       = $itemRepo;
         $this->locationRepository   = $locationRepo;
         $this->tagRepository        = $tagRepo;
+        $this->userRepository       = $userRepo;
     }
 
     /**
@@ -60,24 +65,36 @@ class ItemController extends Controller
      */
     public function store(Request $request)
     {
-       //$token = ;
-       $user = JWTAuth::toUser(JWTAuth::getToken());
-           
-       $data    = $request->input();
-       $title   = $data['title'];
-       $content = $data['content'];
 
-       $data['title']   = utf8_encode($data['title']);
-       $data['content'] = utf8_encode($data['content']);
-       $data['user_id'] = $user->id;
-       
-       $new_item = $this->itemRepository->create($data);
-       $location  = $this->locationRepository->create($data);
-       //TODO: No tags on comments
-       $this->tagRepository->createFromArray($new_item, [$title, $content]);
-       $new_item->locations()->save($location);
-       
-       return response()->json($new_item);
+        $user = JWTAuth::toUser(JWTAuth::getToken());
+           
+        $data    = $request->input();
+        $title   = $data['title'];
+        $content = $data['content'];
+
+        $data['title']   = utf8_encode($data['title']);
+        $data['content'] = utf8_encode($data['content']);
+        $data['user_id'] = $user->id;
+
+        $new_item = $this->itemRepository->create($data);
+        $location  = $this->locationRepository->create($data);
+
+        //if item is a comment, send notifs, don't save tags
+        if(!empty($data['item_id'])) {
+            $item  = $this->itemRepository->find($data['item_id']);
+            $owner = $this->userRepository->find($item->user_id);
+            //check if comment is not from item owner
+            if($owner->id != $user->id) {
+                $owner->notifyClient(new NewComment($item, $user));
+            }
+        } 
+        else {
+            $this->tagRepository->createFromArray($new_item, [$title, $content]);
+        }
+
+        $new_item->locations()->save($location);
+
+        return response()->json($new_item);
     }
 
     /**

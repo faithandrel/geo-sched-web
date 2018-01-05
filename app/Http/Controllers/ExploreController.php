@@ -9,7 +9,6 @@ use App\Http\Requests;
 use App\Repositories\TagRepository;
 use App\Repositories\ItemRepository;
 use App\Services\Emoji\EmojiParser;
-use Log;
 
 class ExploreController extends Controller
 {
