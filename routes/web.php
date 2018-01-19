@@ -196,6 +196,18 @@ Route::group(['middleware' => 'jwt.auth'], function () {
         'as'   => 'emojiFeed',
         'uses' => 'ExploreController@getItemsForEmoji',
       ]);
+  Route::get('new-notifications', [
+        'as'   => 'newNotifications',
+        'uses' => 'NotificationController@newNotifications',
+      ]);
+  Route::post('notifications', [
+        'as'   => 'markAsRead',
+        'uses' => 'NotificationController@markAsRead',
+      ]);
+  Route::get('all-notifications', [
+        'as'   => 'allNotifications',
+        'uses' => 'NotificationController@allNotifications',
+      ]);
 });
 
 Route::get('test', function (Request $request) {
@@ -213,9 +225,9 @@ Route::get('test', function (Request $request) {
 
   echo var_dump($result);*/
 
-  $user  = User::find(2);
-  $item  = Item::find(1);
-  $actor = User::find(4);
+  $user  = User::find(1);
+  $item  = Item::find(2);
+  $actor = User::find(5);
 
   $user->notifyClient(new NewComment($item, $actor));
   $notifications = $user->unreadNotifications;
@@ -230,3 +242,4 @@ Route::get('test', function (Request $request) {
 
   //echo var_dump($notifications[0]->updated_)
 });
+

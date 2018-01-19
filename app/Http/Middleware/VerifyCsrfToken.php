@@ -19,5 +19,6 @@ class VerifyCsrfToken extends Middleware
        'facebook-log-in',
        'save-item',
        'emoji',
+       'notifications',
     ];
 }

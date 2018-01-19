@@ -112,7 +112,7 @@ class NewComment extends Notification implements ItemNotificationInterface
             return false;
         };
 
-        return array_filter($unreadNotifications, $processUnreadNotifications);
+        return array_values(array_filter($unreadNotifications, $processUnreadNotifications));
     }
 
     public function processNotification($notifiable) 
@@ -123,7 +123,7 @@ class NewComment extends Notification implements ItemNotificationInterface
         if(count($existingNotifications) < 1) {
             return true;
         }
-
+        
         $existingNotification = $existingNotifications[0];
 
         $this->counter = $existingNotification->data['counter'] + 1;

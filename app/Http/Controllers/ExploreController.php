@@ -14,10 +14,11 @@ class ExploreController extends Controller
 {
 	private $tagRepository, $itemRepository;
 
-	/**
-	 * @param TagRepository $tagRepo 
-	 * @return type
-	 */
+    /**
+     * @param TagRepository $tagRepo 
+     * @param ItemRepository $itemRepo 
+     * @return type
+     */
     public function __construct(TagRepository $tagRepo,
                                 ItemRepository $itemRepo)
     {
