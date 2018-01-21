@@ -44,10 +44,15 @@ class NotificationController extends Controller
 
         $user = auth()->user();
 
-        $notifications = $user->notifications->sortByDesc('updated_at');
+        $notifications    = $user->notifications->sortByDesc('updated_at');
+        $oldNotifications = $notifications->whereNotIn('read_at', [null]);
+        $newNotifications = $notifications->where('read_at', null);
 
         if(count($notifications) > 0) {
-            $results = array_values($this->prepareForJson($notifications));
+            $results = [
+                'old' => array_values($this->prepareForJson($oldNotifications)),
+                'new' => array_values($this->prepareForJson($newNotifications))
+            ];
         }
 
         return response()->json($results);
