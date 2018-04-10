@@ -9,7 +9,7 @@ trait Notifiable
 
     public function notifyClient(ItemNotificationInterface $instance) 
     {
-    	if($instance->processNotification($this)) {
+    	if(!$instance->checkExistingNotification($this)) {
     		$this->notify($instance);
     	}
     }

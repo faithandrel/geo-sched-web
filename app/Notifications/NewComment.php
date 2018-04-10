@@ -71,7 +71,11 @@ class NewComment extends Notification implements ItemNotificationInterface
         ];
     }
 
-
+    /**
+     * Returns text for the notification
+     * @param type $notifiable 
+     * @return string
+     */
     public function getActionText($notifiable) 
     {   
         $commentText = 'comments';
@@ -86,7 +90,12 @@ class NewComment extends Notification implements ItemNotificationInterface
         return 'new '.$commentText.' on a story you are following from';
     }
 
-    public function getActorIds($actor_id_string)
+    /**
+     * Returns array of actor ids including current actor
+     * @param string $actor_id_string 
+     * @return array
+     */
+    public function getActorIds(string $actor_id_string)
     {
         $actor_ids   = explode('|', $actor_id_string);
         $actor_ids[] = $this->actor->id;
@@ -94,12 +103,17 @@ class NewComment extends Notification implements ItemNotificationInterface
         return implode('|', array_unique($actor_ids));
     }
 
+    /**
+     * Finds an unread notification for item
+     * @param type $notifiable 
+     * @return array
+     */
     public function findNotificationsForItem($notifiable) 
     {
         $unreadNotifications = $notifiable->unreadNotifications->all();
         $item_id             = $this->item->id;
         $notifiable_id       = $notifiable->id;
-        $notification_type    = static::class;
+        $notification_type   = static::class;
 
         $processUnreadNotifications = function($notification) 
                                      use ($item_id, $notifiable_id, $notification_type) {
@@ -115,34 +129,48 @@ class NewComment extends Notification implements ItemNotificationInterface
         return array_values(array_filter($unreadNotifications, $processUnreadNotifications));
     }
 
-    public function processNotification($notifiable) 
+    /**
+     * Description
+     * @param type $notification 
+     * @param type $notifiable 
+     * @return type
+     */
+    public function updateNotification($notification, $notifiable)
     {
-        $existingNotifications = $this->findNotificationsForItem($notifiable);
-
-        //No existing notif, create new
-        if(count($existingNotifications) < 1) {
-            return true;
-        }
-        
-        $existingNotification = $existingNotifications[0];
-
-        $this->counter = $existingNotification->data['counter'] + 1;
+        $this->counter = $notification->data['counter'] + 1;
 
         $data = $this->toArray($notifiable);
 
-        $data['actor_id'] = $this->getActorIds($existingNotification->data['actor_id']);
+        $data['actor_id'] = $this->getActorIds($notification->data['actor_id']);
         
-        if($data['counter'] == 2 && $this->actor->id != $existingNotification->data['actor_id']) {
-            $data['text'] .= ' and '.$existingNotification->data['actor_name'];
+        if($data['counter'] == 2 && $this->actor->id != $notification->data['actor_id']) {
+            $data['text'] .= ' and '.$notification->data['actor_name'];
         }
         else if (strpos($data['actor_id'], '|') != false) {
             $data['text'] .= ' and more';
         }
 
         //Update existing notif
-        $existingNotification->data = $data;
-        $existingNotification->save();
+        $notification->data = $data;
+        $notification->save();
+    }
 
-        return false;
+    /**
+     * Checks if notification exists, updates and returns true if it exists, returns false id it doesn't
+     * @param type $notifiable 
+     * @return bool
+     */
+    public function checkExistingNotification($notifiable) 
+    {
+        $existingNotifications = $this->findNotificationsForItem($notifiable);
+
+        //No existing notif, create new
+        if(count($existingNotifications) < 1) {
+            return false;
+        }
+        
+        $this->updateNotification($existingNotifications[0], $notifiable);
+
+        return true;
     }
 }

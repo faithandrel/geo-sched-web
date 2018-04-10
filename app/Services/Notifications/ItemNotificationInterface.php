@@ -4,6 +4,6 @@ namespace App\Services\Notifications;
 
 interface ItemNotificationInterface {
 
-	public function processNotification($notifiable);
+	public function checkExistingNotification($notifiable);
 
 }
