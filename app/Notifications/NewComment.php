@@ -130,10 +130,9 @@ class NewComment extends Notification implements ItemNotificationInterface
     }
 
     /**
-     * Description
+     * Updates an existing notification
      * @param type $notification 
      * @param type $notifiable 
-     * @return type
      */
     public function updateNotification($notification, $notifiable)
     {

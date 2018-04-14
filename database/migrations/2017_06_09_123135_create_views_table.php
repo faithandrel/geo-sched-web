@@ -23,6 +23,8 @@ class CreateViewsTable extends Migration
             $table->foreign('item_id')
                     ->references('id')->on('items');
 
+            $table->unique(['user_id', 'item_id']);
+
             $table->timestamps();
         });
     }

@@ -9,22 +9,24 @@ use App\Repositories\ItemRepository;
 use App\Repositories\LocationRepository;
 use App\Repositories\TagRepository;
 use App\Repositories\UserRepository;
+use App\Repositories\ViewRepository;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Notifications\NewComment;
 
 
 class ItemController extends Controller
 {
-    private $itemRepository, $locationRepository, $tagRepository, $userRepository;
+    private $itemRepository, $locationRepository, $tagRepository, $userRepository, $viewRepository;
 
     public function __construct(ItemRepository $itemRepo,
                                 LocationRepository $locationRepo,
                                 TagRepository $tagRepo,
-                                UserRepository $userRepo) {
+                                UserRepository $userRepo,
+                                ViewRepository $viewRepo) {
         $this->itemRepository       = $itemRepo;
         $this->locationRepository   = $locationRepo;
         $this->tagRepository        = $tagRepo;
-        $this->userRepository       = $userRepo;
+        $this->viewRepository       = $viewRepo;
     }
 
     /**
@@ -105,8 +107,18 @@ class ItemController extends Controller
      */
     public function show($id)
     {
+        $user = auth()->user();
         $item = $this->itemRepository->find($id);
         $item->comments = $item->comments;
+
+        if($item->user_id != $user->id) {
+            $this->viewRepository->firstOrCreate($user, $item);
+        }
+
+        $viewCount = $this->viewRepository->getItemViewCount($item);
+
+        //notification here
+
         return response()->json($item);
     }
 
