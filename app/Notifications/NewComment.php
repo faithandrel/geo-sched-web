@@ -7,6 +7,8 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 
+use App\Models\Item;
+use App\Models\User;
 use App\Services\Notifications\ItemNotificationInterface;
 
 class NewComment extends Notification implements ItemNotificationInterface
@@ -23,7 +25,7 @@ class NewComment extends Notification implements ItemNotificationInterface
      *
      * @return void
      */
-    public function __construct($item, $actor)
+    public function __construct(Item $item, User $actor)
     {
         $this->item  = $item;
         $this->actor = $actor;

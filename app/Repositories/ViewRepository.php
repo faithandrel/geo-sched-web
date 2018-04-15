@@ -18,8 +18,8 @@ class ViewRepository extends Repository {
     }
 
     public function getItemViewCount(Item $item) {
-    	$views = $this->findAllBy('item_id', $item->id);
+    	$views = View::where('item_id', $item->id)->count();
 
-    	return $views->count();
+    	return $views;
     }
 }

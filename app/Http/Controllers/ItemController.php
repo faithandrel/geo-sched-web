@@ -12,7 +12,7 @@ use App\Repositories\UserRepository;
 use App\Repositories\ViewRepository;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Notifications\NewComment;
-
+use App\Notifications\ViewCount;
 
 class ItemController extends Controller
 {
@@ -112,12 +112,30 @@ class ItemController extends Controller
         $item->comments = $item->comments;
 
         if($item->user_id != $user->id) {
-            $this->viewRepository->firstOrCreate($user, $item);
+            $view = $this->viewRepository->findWhere([
+                            'user_id' => $user->id,
+                            'item_id' => $item->id
+                        ]);
+            
+            if($view->count() < 1) {
+                $this->viewRepository->create([
+                            'user_id' => $user->id,
+                            'item_id' => $item->id
+                        ]);
+                $viewCount     = $this->viewRepository->getItemViewCount($item);
+                $item->counter = $viewCount;
+
+                if(in_array($viewCount, config('viewcount'))) {
+                    $item->user->notify(new ViewCount($item, $viewCount));
+                }
+            }
+            else {
+                $item->counter = $this->viewRepository->getItemViewCount($item);
+            }
+            
         }
 
-        $viewCount = $this->viewRepository->getItemViewCount($item);
-
-        //notification here
+        
 
         return response()->json($item);
     }

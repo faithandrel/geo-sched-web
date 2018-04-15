@@ -36,4 +36,8 @@ class Item extends Model
     public function comments() {
         return $this->hasMany(Item::class);
     }
+
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
 }
