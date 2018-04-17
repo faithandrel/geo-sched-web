@@ -20,9 +20,11 @@ use App\Geolocation;
 use App\Services\Emoji\EmojiParser;
 use App\Repositories\TagRepository;
 use LaravelFCM\Message\PayloadNotificationBuilder;
+use LaravelFCM\Message\PayloadDataBuilder;
 use App\Notifications\NewComment;
+use App\Notifications\ViewCount;
 
-Route::get('/', function (Request $request, TagRepository $tagRepo) {
+Route::get('/', function (Request $request, TagRepository $tagRepo, $test) {
    /*$response = \GoogleMaps::load('geocoding')
         ->setParam (['address' =>'santa cruz'])
         ->get();
@@ -30,9 +32,9 @@ Route::get('/', function (Request $request, TagRepository $tagRepo) {
     
     $matches = [];
     $items = Item::all();
-    $stringToParse = $items[0]->title;
-    //$tagRepo->createFromArray($items[2], [$items[2]->content, $items[3]->content]);
-    echo var_dump($stringToParse);
+    /*$stringToParse = $items[0]->title;*/
+    $tagRepo->createFromArray($items[0], [$test]);
+    /*echo var_dump($stringToParse);
     echo var_dump(LaravelEmojiOne::toShort($stringToParse));
     
     $emoji_array = EmojiParser::parse($stringToParse); //array_unique($matches[1]);
@@ -40,9 +42,10 @@ Route::get('/', function (Request $request, TagRepository $tagRepo) {
 
     foreach ($emoji_array as $emoji) {
       echo $emoji." - ".EmojiParser::shortnameToUnicode(":".$emoji.":")."<br/>";
-    }
-    /*$items = Item::all();
-    return response()->json($items);*/
+    }*/
+    
+    echo var_dump($test);
+
     //return view('welcome');
 });
 
@@ -175,7 +178,7 @@ Route::post('facebook-log-in', ['middleware' => ['cors'], function(Request $requ
     return Response::json(compact('token'));
 }]);
 
-Route::group(['middleware' => 'jwt.auth'], function () {
+Route::middleware(['jwt.auth', 'update.active'])->group(function () {
   Route::get('get-items', [
         'as'   => 'getItems',
         'uses' => 'ItemController@index',
@@ -196,10 +199,6 @@ Route::group(['middleware' => 'jwt.auth'], function () {
         'as'   => 'emojiFeed',
         'uses' => 'ExploreController@getItemsForEmoji',
       ]);
-  Route::get('new-notifications', [
-        'as'   => 'newNotifications',
-        'uses' => 'NotificationController@newNotifications',
-      ]);
   Route::post('notifications', [
         'as'   => 'markAsRead',
         'uses' => 'NotificationController@markAsRead',
@@ -210,12 +209,18 @@ Route::group(['middleware' => 'jwt.auth'], function () {
       ]);
 });
 
+Route::get('new-notifications', [
+        'middleware' => 'jwt.auth',
+        'as'   => 'newNotifications',
+        'uses' => 'NotificationController@newNotifications',
+      ]);
+
 Route::get('test', function (Request $request) {
   /*$deviceToken = User::first()->device_token;
   
   $notificationBuilder = new PayloadNotificationBuilder();
-  $notificationBuilder->setTitle('title')
-                  ->setBody('it\'s still me!')
+  $notificationBuilder->setTitle('Test notification')
+                  ->setBody('Click to open!')
                   ->setSound('default')
                   ->setTag('test');
 
@@ -224,13 +229,23 @@ Route::get('test', function (Request $request) {
   $result = FCM::sendTo($deviceToken, null, $notification);
 
   echo var_dump($result);*/
+  /*$dataBuilder = new PayloadDataBuilder();
+  $dataBuilder->addData([
+    'data_1' => 'first_data'
+  ]);
+
+  $data = $dataBuilder->build();
+
+  $result = FCM::sendTo($deviceToken, null, null, $data);
+
+  echo var_dump($data);*/
 
   $user  = User::find(1);
-  $item  = Item::find(2);
-  $actor = User::find(5);
+  $item  = Item::find(26);
+  $actor = User::find(7);
 
-  $user->notifyClient(new NewComment($item, $actor));
-  $notifications = $user->unreadNotifications;
+  $user->notify(new ViewCount($item, 10));
+  //$notifications = $user->unreadNotifications;
 
   /*$notification = $notifications[0];
 
@@ -238,8 +253,59 @@ Route::get('test', function (Request $request) {
 
   $notification->save();*/
 
-  echo var_dump($notifications->sortByDesc('updated_at')->all());
+  //echo var_dump($notifications->sortByDesc('updated_at')->all());
 
   //echo var_dump($notifications[0]->updated_)
 });
 
+Route::get('test-fcm', function (Request $request) {
+  $deviceToken = User::find(12)->device_token;
+  
+  $notificationBuilder = new PayloadNotificationBuilder();
+  $notificationBuilder->setTitle('Test notification')
+                  ->setBody('Click to open!')
+                  ->setSound('default')
+                  ->setTag('test');
+
+  $notification = $notificationBuilder->build();
+
+  $result = FCM::sendTo($deviceToken, null, $notification);
+
+  echo var_dump($result);
+
+    /*define( 'FCM_API_ACCESS_KEY', env('FCM_SERVER_KEY') );
+    $registrationIds = User::first()->device_token;
+
+     $msg = array
+          (
+    'body'  => 'Body  Of Notification',
+    'title' => 'Title Of Notification',
+              'icon'  => 'myicon',
+                'sound' => 'mySound'
+          );
+  $fields = [
+                'data'  => ['test' => 'hello'],
+                
+              'to'    => $registrationIds
+            ];
+  
+  
+  $headers = array
+      (
+        'Authorization: key=' . FCM_API_ACCESS_KEY,
+        'Content-Type: application/json'
+      );
+
+    $ch = curl_init();
+    curl_setopt( $ch,CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send' );
+    curl_setopt( $ch,CURLOPT_POST, true );
+    curl_setopt( $ch,CURLOPT_HTTPHEADER, $headers );
+    curl_setopt( $ch,CURLOPT_RETURNTRANSFER, true );
+    curl_setopt( $ch,CURLOPT_SSL_VERIFYPEER, false );
+    curl_setopt( $ch,CURLOPT_POSTFIELDS, json_encode( $fields ) );
+    $result = curl_exec($ch );
+    curl_close( $ch );
+
+    echo var_dump($result);*/
+  
+});
