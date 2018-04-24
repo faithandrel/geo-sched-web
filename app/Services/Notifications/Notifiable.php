@@ -13,4 +13,11 @@ trait Notifiable
     		$this->notify($instance);
     	}
     }
+
+    public function latestUnreadNotification()
+    {
+    	$notification = $this->unreadNotifications->sortByDesc('updated_at')->first();
+
+    	return $notification;
+    }
 }

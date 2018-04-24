@@ -25,6 +25,12 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    protected $dates = [
+        'last_active',
+        'last_notified',
+    ];
+
     
     public function items()
     {

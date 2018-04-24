@@ -26,6 +26,7 @@ class ItemController extends Controller
         $this->itemRepository       = $itemRepo;
         $this->locationRepository   = $locationRepo;
         $this->tagRepository        = $tagRepo;
+        $this->userRepository       = $userRepo;
         $this->viewRepository       = $viewRepo;
     }
 
